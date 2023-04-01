@@ -40,7 +40,11 @@ export const login = (credential: Credentials, asHost: boolean): Promise<any> =>
         }
 
         // returns a `Promise` that resolves to the `Response` object representing the response to the request
+        // asking the `Response` object to parse the body text as JSON and return the resulting JavaScript object
         return response.json();
     });
 };
 
+export const register = (credential: Credentials, asHost: boolean) => {
+    const registerUrl = 
+}
