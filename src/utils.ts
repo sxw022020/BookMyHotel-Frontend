@@ -53,7 +53,7 @@ export const login = async (credential: Credentials, asHost: boolean): Promise<a
  * @param credential 
  * @param asHost 
  */
-export const registeration = async (credential: Credentials, asHost: boolean): Promise<void> => {
+export const registration = async (credential: Credentials, asHost: boolean): Promise<void> => {
     /**
      * A `Promise<void>` represents a `Promise` that resolves to an undefined value, 
      * typically indicating that the `Promise` is used for its side effects rather than returning a meaningful value. 
