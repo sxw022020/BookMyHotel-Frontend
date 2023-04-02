@@ -51,7 +51,7 @@ const App: React.FC = () => {
        * This callback function is used to update the state of the parent component and 
        * store the authentication token and `asHost` status in the `localStorage`.
        */
-      return <LoginPage onLoginSuccess = {handleLoginSuccess} />
+      return <LoginPage handleLoginSuccess = {handleLoginSuccess} />
     }
 
     if (asHost) {
