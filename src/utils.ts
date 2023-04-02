@@ -14,7 +14,6 @@ interface Credentials {
 
 interface Query {
     guest_number: number;
-    // TODO: Replace 'any' with a more specific type if possible, e.g., Moment or Date
     checkin_date: Date;
     checkout_date: Date;
 }
@@ -52,9 +51,14 @@ export const login = async (credential: Credentials, asHost: boolean): Promise<a
  * 
  * @param credential 
  * @param asHost 
- * @returns Promise<void>
  */
 export const registeration = async (credential: Credentials, asHost: boolean): Promise<void> => {
+    /**
+     * A `Promise<void>` represents a `Promise` that resolves to an undefined value, 
+     * typically indicating that the `Promise` is used for its side effects rather than returning a meaningful value. 
+     * It is commonly used with asynchronous functions that perform an action but do not return a result.
+     */
+
     const registerationUrl = `${domain}/registration/${asHost ? "host" : "guest"}`;
 
     const response = await fetch(registerationUrl, {
@@ -110,9 +114,13 @@ export const getStaysByHost = async (): Promise<any> => {
     return await response.json();
   };
 
+  /**
+   * 5. "SearchStays" feature
+   * @param query 
+   * @returns Promise<any>
+   */
 export const searchStays = async (query: Query): Promise<any> => {
     const authToken = localStorage.getItem("authToken");
-    // TODO: why there is "/" in the end?
     const searchStaysUrl = new URL(`${domain}/search/`);
 
     searchStaysUrl.searchParams.append("guest_number", query.guest_number.toString());
@@ -125,7 +133,122 @@ export const searchStays = async (query: Query): Promise<any> => {
         format(query.checkout_date, "YYYY-MM-DD")
     );
     searchStaysUrl.searchParams.append("lat", "37.65");
-    searchStaysUrl.searchParams.append("lon", "-118.82");
+    searchStaysUrl.searchParams.append("lon", "-117.82");
 
-    
+    const response = await fetch(searchStaysUrl, {
+        headers: {
+            Authorization: `Bearer ${authToken}`,
+        },
+    });
+
+    if (response.status !== 200) {
+        throw Error("Fail to search stays!");
+    }
+
+    return response.json();
 }
+
+/**
+ * 6. "DeleteStay" feature
+ * @param stayId 
+ */
+export const deleteStay = async (stayId: string): Promise<void> => {
+  const authToken = localStorage.getItem("authToken");
+  const deleteStayUrl = `${domain}/stays/${stayId}`;
+
+  const response = await fetch(deleteStayUrl, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw Error("Fail to delete stay!");
+  }
+};
+
+/**
+ * 7. "BookStay" feature
+ * @param data 
+ */
+export const bookStay = async (data: any): Promise<void> => {
+  const authToken = localStorage.getItem("authToken");
+  const bookStayUrl = `${domain}/reservations`;
+
+  const response = await fetch(bookStayUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (response.status !== 200) {
+    throw Error("Fail to book reservation!");
+  }
+};
+
+/**
+ * 8. "CancelReservation" feature
+ * @param reservationId 
+ */
+export const cancelReservation = async (reservationId: string): Promise<void> => {
+  const authToken = localStorage.getItem("authToken");
+  const cancelReservationUrl = `${domain}/reservations/${reservationId}`;
+
+  const response = await fetch(cancelReservationUrl, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw Error("Fail to cancel reservation!");
+  }
+};
+
+/**
+ * 9. "GetReservationsByStay" feature
+ * @param stayId 
+ * @returns 
+ */
+export const getReservationsByStay = async (stayId: string): Promise<any> => {
+  const authToken = localStorage.getItem("authToken");
+  const getReservationByStayUrl = `${domain}/stays/reservations/${stayId}`;
+
+  const response = await fetch(getReservationByStayUrl, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw Error("Fail to get reservations by stay!");
+  }
+
+  return response.json();
+};
+
+/**
+ * 10. "UploadStay" feature
+ * @param data 
+ */
+export const uploadStay = async (data: FormData): Promise<void> => {
+  const authToken = localStorage.getItem("authToken");
+  const uploadStayUrl = `${domain}/stays`;
+
+  const response = await fetch(uploadStayUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: data,
+  });
+
+  if (response.status !== 200) {
+    throw Error("Fail to upload stay!");
+  }
+};
