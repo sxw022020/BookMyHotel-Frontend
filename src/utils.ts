@@ -12,6 +12,7 @@ interface Credentials {
     [key: string]: any;
 }
 
+// TODO: where to create the `Query` object
 interface Query {
     guest_number: number;
     checkin_date: Date;
