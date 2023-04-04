@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Form, Button, FormControl } from "react-bootstrap";
+import React, { useState, useRef } from "react";
+import { Formik, FormikHelpers } from 'formik';
+import * as yup from 'yup';
+import { Form, Button, Col, Row, InputGroup } from "react-bootstrap";
 import { AiOutlineUser } from "react-icons/ai";
 import { login, registration } from "../utils";
 
@@ -24,6 +26,7 @@ interface LoginPageProps {
  * and `<LoginPageProps>` specifies the type of the component's props. 
  */
 const LoginPage: React.FC<LoginPageProps> = ({ handleLoginSuccess }) => {
+
     const formRef = useRef<HTMLFormElement>(null);
     const [asHost, setAsHost] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -55,7 +58,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ handleLoginSuccess }) => {
             const formData = new FormData(formRef.current);
             setLoading(true);
 
-            const response = await registration(Object.fromEntries(formData), asHost);
+            await registration(Object.fromEntries(formData), asHost);
             console.log("Registration Succeeded!");
         } catch (error) {
             console.error("A error occurred: ", error);
@@ -68,13 +71,68 @@ const LoginPage: React.FC<LoginPageProps> = ({ handleLoginSuccess }) => {
         setAsHost(e.target.checked);
     };
 
+interface FormValues {
+  firstName: string;
+  lastName: string;
+  username: string;
+  city: string;
+  state: string;
+  zip: string;
+  terms: boolean;
+}
+
+const schema = yup.object().shape({
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  username: yup.string().required(),
+  city: yup.string().required(),
+  state: yup.string().required(),
+  zip: yup.string().required(),
+  terms: yup.bool().required().oneOf([true], 'Terms must be accepted'),
+});
+
+function FormExample() {
+  return (
+    <Formik<FormValues>
+      validationSchema={schema}
+      onSubmit={(values, helpers: FormikHelpers<FormValues>) => {
+        console.log(values);
+        helpers.setSubmitting(false);
+      }}
+      initialValues={{
+        firstName: 'Mark',
+        lastName: 'Otto',
+        username: '',
+        city: '',
+        state: '',
+        zip: '',
+        terms: false,
+      }}
+    >
+      {({
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        values,
+        touched,
+        isValid,
+        errors,
+      }) => (
+        <Form noValidate onSubmit={handleSubmit}>
+          {/* ... Rest of the form code */}
+        </Form>
+      )}
+    </Formik>
+    );
+}
+
     return (
         <div style = {{ width: 500, margin: "20px auto"}}>
 
-            <Form ref = {formRef} onSubmit = {onFinish}>
+            <Form ref = { formRef } onSubmit = { onFinish }>
                 <Form.Group controlId = "username">
-                    <FormControl 
-                        disabled = {loading}
+                    <Form.Control 
+                        disabled = { loading }
                         type = "text"
                         placeholder = "Username"
                         required
@@ -85,7 +143,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ handleLoginSuccess }) => {
                 </Form.Group>
 
                 <Form.Group controlId = "password">
-                    <FormControl 
+                    <Form.Control 
                         disabled = {loading}
                         type = "password"
                         placeholder = "Password"
